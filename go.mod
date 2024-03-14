@@ -1,4 +1,4 @@
-module github.com/shawnfeng/sutil
+module github.com/shawnfeng/sutil2
 
 require (
 	github.com/ZhengHe-MD/agollo/v4 v4.1.4
