@@ -395,7 +395,22 @@ func HttpReqGet(url string, timeout time.Duration) (int, http.Header, []byte, er
 
 }
 
+func HttpReqGetWithHead(url string, heads http.Header, timeout time.Duration) (int, http.Header, []byte, error) {
+	return HttpReqWithHead(url, "GET", heads, nil, timeout)
+
+}
+
+func HttpReqGetWithHeadTransport(transport *http.Transport, url string, heads http.Header, timeout time.Duration) (int, http.Header, []byte, error) {
+	return HttpReqWithHeadTransport(transport, url, "GET", heads, nil, timeout)
+
+}
+
 func HttpReqWithHead(url, method string, heads http.Header, data []byte, timeout time.Duration) (int, http.Header, []byte, error) {
+
+	return HttpReqWithHeadTransport(nil, url, method, heads, data, timeout)
+}
+
+func HttpReqWithHeadTransport(transport *http.Transport, url, method string, heads http.Header, data []byte, timeout time.Duration) (int, http.Header, []byte, error) {
 
 	reqest, err := http.NewRequest(method, url, bytes.NewReader(data))
 	if err != nil {
@@ -409,6 +424,10 @@ func HttpReqWithHead(url, method string, heads http.Header, data []byte, timeout
 		Timeout: timeout,
 	}
 
+	if transport != nil {
+		client.Transport = transport
+	}
+
 	response, err := client.Do(reqest)
 	if err != nil {
 		return 0, nil, nil, err
@@ -416,7 +435,7 @@ func HttpReqWithHead(url, method string, heads http.Header, data []byte, timeout
 
 	defer response.Body.Close()
 
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return 0, nil, nil, err
 	}
