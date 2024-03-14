@@ -21,10 +21,10 @@ import (
 )
 
 var DefaultClient *http.Client = &http.Client{
-	Transport: &http.Transport{
-		MaxIdleConnsPerHost: 128,
-		MaxConnsPerHost:     1024,
-	},
+	//Transport: &http.Transport{
+	//MaxIdleConnsPerHost: 128,
+	//MaxConnsPerHost:     1024,
+	//},
 	Timeout: 0,
 }
 
@@ -50,9 +50,9 @@ func IpBetweenStr(from, to, test string) (bool, error) {
 	return IpBetween(net.ParseIP(from), net.ParseIP(to), net.ParseIP(test))
 }
 
-//10.0.0.0/8：10.0.0.0～10.255.255.255
-//172.16.0.0/12：172.16.0.0～172.31.255.255
-//192.168.0.0/16：192.168.0.0～192.168.255.255
+// 10.0.0.0/8：10.0.0.0～10.255.255.255
+// 172.16.0.0/12：172.16.0.0～172.31.255.255
+// 192.168.0.0/16：192.168.0.0～192.168.255.255
 func IsInterIp(ip string) (bool, error) {
 	ok, err := IpBetweenStr("10.0.0.0", "10.255.255.255", ip)
 	if err != nil {
@@ -342,13 +342,12 @@ func HttpReqGetOk(url string, timeout time.Duration) ([]byte, error) {
 		return nil, err
 	}
 
-	ctx, cancel := context.WithCancel(context.TODO())
-	time.AfterFunc(timeout, func() {
-		cancel()
-	})
-	req = req.WithContext(ctx)
+	// 创建一个默认的 HTTP 客户端
+	client := &http.Client{
+		Timeout: timeout,
+	}
 
-	response, err := DefaultClient.Do(req)
+	response, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -365,6 +364,64 @@ func HttpReqGetOk(url string, timeout time.Duration) ([]byte, error) {
 	} else {
 		return body, nil
 	}
+
+}
+
+// 返回code header body，如果发生错误返回error
+func HttpReqGet(url string, timeout time.Duration) (int, http.Header, []byte, error) {
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return 0, nil, nil, err
+	}
+
+	// 创建一个默认的 HTTP 客户端
+	client := &http.Client{
+		Timeout: timeout,
+	}
+
+	response, err := client.Do(req)
+	if err != nil {
+		return 0, nil, nil, err
+	}
+	defer response.Body.Close()
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return 0, nil, nil, err
+	}
+
+	return response.StatusCode, response.Header, body, nil
+
+}
+
+func HttpReqWithHead(url, method string, heads http.Header, data []byte, timeout time.Duration) (int, http.Header, []byte, error) {
+
+	reqest, err := http.NewRequest(method, url, bytes.NewReader(data))
+	if err != nil {
+		return 0, nil, nil, err
+	}
+
+	reqest.Header = heads
+
+	// 创建一个默认的 HTTP 客户端
+	client := &http.Client{
+		Timeout: timeout,
+	}
+
+	response, err := client.Do(reqest)
+	if err != nil {
+		return 0, nil, nil, err
+	}
+
+	defer response.Body.Close()
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return 0, nil, nil, err
+	}
+
+	return response.StatusCode, response.Header, body, nil
 
 }
 
@@ -419,6 +476,7 @@ func HttpReq(url, method string, data []byte, timeout time.Duration) ([]byte, in
 
 }
 
+/*
 func HttpReqWithHeadOk(url, method string, heads map[string]string, data []byte, timeout time.Duration) ([]byte, error) {
 	body, status, err := HttpReqWithHead(url, method, heads, data, timeout)
 	if err != nil {
@@ -433,38 +491,7 @@ func HttpReqWithHeadOk(url, method string, heads map[string]string, data []byte,
 	}
 
 }
-
-func HttpReqWithHead(url, method string, heads map[string]string, data []byte, timeout time.Duration) ([]byte, int, error) {
-
-	reqest, err := http.NewRequest(method, url, bytes.NewReader(data))
-	if err != nil {
-		return nil, 0, err
-	}
-	ctx, cancel := context.WithCancel(context.TODO())
-	time.AfterFunc(timeout, func() {
-		cancel()
-	})
-	reqest = reqest.WithContext(ctx)
-
-	for key, val := range heads {
-		reqest.Header.Set(key, val)
-	}
-
-	response, err := DefaultClient.Do(reqest)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	defer response.Body.Close()
-
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	return body, response.StatusCode, nil
-
-}
+*/
 
 func HttpRangeDownload(geturl, fileName string, splitSize int, timeout time.Duration) (int, error) {
 

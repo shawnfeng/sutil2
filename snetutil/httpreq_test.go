@@ -2,18 +2,16 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-
 package snetutil
 
 import (
 	"context"
-	"testing"
 	"net/http"
+	"testing"
 
-    "github.com/julienschmidt/httprouter"
-	"github.com/shawnfeng/sutil/slog/slog"
+	"github.com/julienschmidt/httprouter"
+	"github.com/shawnfeng/web3/slog"
 )
-
 
 func TestDo(t *testing.T) {
 
@@ -23,12 +21,9 @@ func TestDo(t *testing.T) {
 	router.GET("/test1", HttpRequestWrapper(FactoryReq1))
 	router.GET("/test2", HttpRequestWrapper(FactoryReq2))
 
-
 	http.ListenAndServe(":12345", router)
 
 }
-
-
 
 type Req0 struct {
 }
@@ -43,13 +38,9 @@ func (m *Req0) Handle(r *HttpRequest) HttpResponse {
 
 	slog.Infof(context.TODO(), "%s url:%s method:%s body:%s", fun, r.URL(), r.Method(), r.Body().Binary())
 
-	return  NewHttpRespString(http.StatusOK, "OK\n")
+	return NewHttpRespString(http.StatusOK, "OK\n")
 
 }
-
-
-
-
 
 type Req1 struct {
 }
@@ -71,17 +62,17 @@ func (m *Req1) Handle(r *HttpRequest) HttpResponse {
 
 	cookies := make([]*http.Cookie, 0)
 	cookies = append(cookies, &http.Cookie{
-		Name: "Set0",
+		Name:  "Set0",
 		Value: "SetValue0",
 	})
 
 	cookies = append(cookies, &http.Cookie{
-		Name: "Set1",
+		Name:  "Set1",
 		Value: "SetValue1",
 	})
 
 	cookies = append(cookies, &http.Cookie{
-		Name: "Set2",
+		Name:  "Set2",
 		Value: "SetValue2",
 	})
 
@@ -90,14 +81,11 @@ func (m *Req1) Handle(r *HttpRequest) HttpResponse {
 		Body: map[string]interface{}{
 			"name": "value",
 		},
-		Header: h,
+		Header:  h,
 		Cookies: cookies,
 	}
 
 }
-
-
-
 
 type Req2 struct {
 }
@@ -114,10 +102,7 @@ func (m *Req2) Handle(r *HttpRequest) HttpResponse {
 
 	return &HttpRespString{
 		Status: 202,
-		Body: "req2",
-
+		Body:   "req2",
 	}
 
 }
-
-
