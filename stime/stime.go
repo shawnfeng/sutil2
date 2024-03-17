@@ -47,6 +47,40 @@ func GetDHMS(seconds int) string {
 
 }
 
+func GetDHMSMilli(milliSeconds int) string {
+	seconds := milliSeconds / 1000
+	resMilli := milliSeconds % 1000
+	days := seconds / (24 * 3600)
+	hours := (seconds % (24 * 3600)) / 3600
+	minutes := (seconds % 3600) / 60
+	seconds = seconds % 60
+
+	var parts []string
+	if days > 0 {
+		parts = append(parts, fmt.Sprintf("%dD", days))
+	}
+	if hours > 0 {
+		parts = append(parts, fmt.Sprintf("%dH", hours))
+	}
+	if minutes > 0 {
+		parts = append(parts, fmt.Sprintf("%dM", minutes))
+	}
+	if seconds > 0 {
+		parts = append(parts, fmt.Sprintf("%dS", seconds))
+	}
+
+	if resMilli > 0 {
+		parts = append(parts, fmt.Sprintf(".%d", resMilli))
+	}
+
+	if len(parts) == 0 {
+		return "0S"
+	}
+
+	return strings.Join(parts, "")
+
+}
+
 func FmtTimeMDHMS(secondStamp int64) string {
 
 	// 将毫秒转换为秒
