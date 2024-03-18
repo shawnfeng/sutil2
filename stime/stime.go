@@ -65,12 +65,8 @@ func GetDHMSMilli(milliSeconds int) string {
 	if minutes > 0 {
 		parts = append(parts, fmt.Sprintf("%dM", minutes))
 	}
-	if seconds > 0 {
-		parts = append(parts, fmt.Sprintf("%dS", seconds))
-	}
-
-	if resMilli > 0 {
-		parts = append(parts, fmt.Sprintf(".%d", resMilli))
+	if seconds > 0 || resMilli > 0 {
+		parts = append(parts, fmt.Sprintf("%d.%dS", seconds, resMilli))
 	}
 
 	if len(parts) == 0 {
