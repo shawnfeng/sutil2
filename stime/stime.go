@@ -303,6 +303,10 @@ func (m *runTimeStat) Reset() {
 	m.since = time.Now()
 }
 
+func (m *runTimeStat) BeginTime() time.Time {
+	return m.since
+}
+
 // func NewTimeStat(key string) *runTimeStat {
 func NewTimeStat() *runTimeStat {
 	return &runTimeStat{
