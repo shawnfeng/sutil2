@@ -95,21 +95,30 @@ func FmtTimeMDHMS(secondStamp int64) string {
 }
 
 func FmtTimeYMDHMSEast8(secondStamp int64) string {
-	return fmtTimeEast8("06-01-02 15:04:05", secondStamp)
-
+	return fmtTimeEast8("06-01-02 15:04:05", secondStamp*1000)
 }
 
 func FmtTimeMDHMSEast8(secondStamp int64) string {
-	return fmtTimeEast8("01-02 15:04:05", secondStamp)
+	return fmtTimeEast8("01-02 15:04:05", secondStamp*1000)
 }
 
-func fmtTimeEast8(format string, secondStamp int64) string {
+func FmtTimeYMDHMSMilliEast8(milliSecondsStamp int64) string {
+	return fmtTimeEast8("06-01-02 15:04:05.000", milliSecondsStamp)
+
+}
+
+func FmtTimeMDHMSMilliEast8(milliSecondsStamp int64) string {
+	return fmtTimeEast8("01-02 15:04:05.000", milliSecondsStamp)
+
+}
+
+func fmtTimeEast8(format string, milliSecondsStamp int64) string {
 
 	// 将毫秒转换为秒
 	//seconds := secondStamp
 	//msTimestamp := secondStamp * 1000
 	//nanoseconds := (msTimestamp % 1000) * 1000000
-	timestamp := time.Unix(secondStamp, 0)
+	timestamp := time.UnixMilli(milliSecondsStamp)
 
 	// 定义东八区时区
 	location, err := time.LoadLocation("Asia/Shanghai") // 东八区，例如北京时间
