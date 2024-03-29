@@ -32,6 +32,13 @@ type ContextTrace struct {
 	//ctx map[string]interface{}
 }
 
+func NewContextTraceByArgs(id snowflake.ID, since time.Time) ContextTrace {
+	return ContextTrace{
+		id:    id,
+		since: since,
+	}
+}
+
 func NewContextTrace() ContextTrace {
 
 	return ContextTrace{
