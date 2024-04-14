@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-
 package ssync
 
 import (
@@ -10,16 +9,13 @@ import (
 	//"fmt"
 )
 
-
-
 type Mutex struct {
 	once sync.Once
-	mu chan bool
+	mu   chan bool
 }
 
-
 func (m *Mutex) initLock() {
-	m.once.Do(func(){
+	m.once.Do(func() {
 		//fmt.Println("init lock")
 		m.mu = make(chan bool, 1)
 	})
@@ -32,12 +28,11 @@ func (m *Mutex) Lock() {
 
 func (m *Mutex) Unlock() {
 	select {
-	case <- m.mu:
+	case <-m.mu:
 	default:
 		panic("ssync: unlock of unlocked mutex")
 	}
 }
-
 
 func (m *Mutex) Trylock() bool {
 	m.initLock()
@@ -47,4 +42,22 @@ func (m *Mutex) Trylock() bool {
 	default:
 		return false
 	}
+}
+
+type AtomicString struct {
+	mu  sync.Mutex
+	str string
+}
+
+func (a *AtomicString) Load() string {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	return a.str
+}
+
+func (a *AtomicString) Store(s string) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	a.str = s
 }
