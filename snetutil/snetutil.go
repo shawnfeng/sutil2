@@ -18,6 +18,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/brianvoe/gofakeit/v7"
 )
 
 var DefaultClient *http.Client = &http.Client{
@@ -644,5 +646,12 @@ func PackageSplit(conn net.Conn, readtimeout time.Duration, readCall func([]byte
 	}
 
 	return false, nil, errors.New("fuck err")
+
+}
+
+func FakeUserAgent() string {
+
+	//gofakeit.Seed(0) // 可以提供一个种子来生成可重复的结果
+	return gofakeit.UserAgent()
 
 }
